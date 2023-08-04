@@ -30,7 +30,7 @@ tf.random.set_seed(seed)
 
 class ReRaLSTM:
     def __init__(self, data_path, market_name, tickers_fname, relation_name,
-                 emb_fname, parameters, steps=1, epochs=50, batch_size=None, flat=False, gpu=True, in_pro=False):
+                  parameters, steps=1, epochs=50, batch_size=None, flat=False, gpu=True, in_pro=False):
 
         seed = 123456789
         random.seed(seed)
@@ -60,9 +60,9 @@ class ReRaLSTM:
         print('relation encoding shape:', self.rel_encoding.shape)
         print('relation mask shape:', self.rel_mask.shape)
 
-        self.embedding = np.load(
-            os.path.join(self.data_path, '..', 'pretrain', emb_fname))
-        print('embedding shape:', self.embedding.shape)
+        #self.embedding = np.load(
+            #os.path.join(self.data_path, '..', 'pretrain', emb_fname))
+        #print('embedding shape:', self.embedding.shape)
 
         self.parameters = copy.copy(parameters)
         self.steps = steps
@@ -449,7 +449,6 @@ if __name__ == '__main__':
         market_name=args.m,
         tickers_fname=args.t,
         relation_name=args.rel_name,
-        emb_fname=args.emb_file,
         parameters=parameters,
         steps=1, epochs=50, batch_size=None, gpu=args.gpu,
         in_pro=args.inner_prod

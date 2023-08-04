@@ -113,11 +113,11 @@ class EOD_Preprocessor:
 
 if __name__ == '__main__':
     data_path = '../data/google_finance'
-    market_name = 'NASDAQ'
-    selected_tickers_fname = 'NASDAQ_tickers_qualify_dr-0.98_min-5_smooth.csv'
+    market_name = 'NYSE'
+    selected_tickers_fname = market_name+'_tickers_qualify_dr-0.98_min-5_smooth.csv'
     begin_date = datetime.strptime('2012-11-19 00:00:00', '%Y-%m-%d %H:%M:%S')
-    correlation_threshold = 0.975
-    output_file = 'correlation_graph.json'
+    correlation_threshold = 0.99
+    output_file = '../data/price_graph/'+market_name+'_correlation_graph_'+str(correlation_threshold)+'.json'
 
     processor = EOD_Preprocessor(data_path, market_name)
     correlation_graph = processor.generate_correlation_graph(selected_tickers_fname, begin_date, correlation_threshold, output_file)

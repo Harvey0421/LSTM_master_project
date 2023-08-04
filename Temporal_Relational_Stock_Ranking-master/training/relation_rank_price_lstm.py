@@ -35,9 +35,8 @@ def load_relation_data(relation_file):
     return relation_encoding, mask
 
 
-class ReRaLSTM:
-    def __init__(self, data_path, market_name, tickers_fname, relation_name,
-                 emb_fname, parameters, steps=1, epochs=50, batch_size=None, flat=False, gpu=True, in_pro=False,
+class ReRaPrLSTM:
+    def __init__(self, data_path, market_name, tickers_fname, relation_name, parameters, steps=1, epochs=50, batch_size=None, flat=False, gpu=True, in_pro=False,
                  new_relation_graph=None):
 
         seed = 123456789
@@ -68,9 +67,9 @@ class ReRaLSTM:
         print('relation encoding shape:', self.rel_encoding.shape)
         print('relation mask shape:', self.rel_mask.shape)
 
-        self.embedding = np.load(
-            os.path.join(self.data_path, '..', 'pretrain', emb_fname))
-        print('embedding shape:', self.embedding.shape)
+        #self.embedding = np.load(
+        #    os.path.join(self.data_path, '..', 'pretrain', emb_fname))
+        #print('embedding shape:', self.embedding.shape)
 
         self.parameters = copy.copy(parameters)
         self.steps = steps
@@ -467,7 +466,8 @@ class ReRaLSTM:
         sess.close()
         tf.compat.v1.reset_default_graph()
         return best_valid_pred, best_valid_gt, best_valid_mask, \
-               best_test_pred, best_test_gt, best_test_mask
+               best_test_pred, best_test_gt, best_test_mask, \
+               best_valid_perf, best_test_perf
 
     def update_model(self, parameters):
         for name, value in parameters.items():
@@ -504,6 +504,8 @@ if __name__ == '__main__':
                         default='wikidata',
                         help='relation type: sector_industry or wikidata')
     parser.add_argument('-ip', '--inner_prod', type=int, default=0)
+    parser.add_argument('-ct', default=0.95,
+                        help='correlation_threshold')
     args = parser.parse_args()
 
     if args.t is None:
@@ -517,19 +519,19 @@ if __name__ == '__main__':
     print('arguments:', args)
     print('parameters:', parameters)
 
-    RR_LSTM = ReRaLSTM(
+    RRP_LSTM = ReRaPrLSTM(
         data_path=args.p,
         market_name=args.m,
         tickers_fname=args.t,
         relation_name=args.rel_name,
-        emb_fname=args.emb_file,
         parameters=parameters,
         steps=1, epochs=50, batch_size=None, gpu=args.gpu,
         in_pro=args.inner_prod,
-        new_relation_graph='../data/price_graph/correlation_graph_095.json'
+        new_relation_graph='../data/price_graph/'+args.m+'_correlation_graph_'+str(args.ct)+'.json'
     )
 
-    pred_all = RR_LSTM.train()
+    pred_all = RRP_LSTM.train()
+    print('Pred_All:',pred_all)
 
-#Best Valid performance: {'mse': 0.0005080483988200873, 'mrrt': 0.02344550196264557, 'btl': 2.3256982371094637}
-#Best Test performance: {'mse': 0.00041960438190842526, 'mrrt': 0.03526323856079384, 'btl': 1.4340713121637236}
+#Best Valid performance: {'mse': 0.0004958068088824255, 'mrrt': 0.0199531754167635, 'btl': 2.3591825100884307}
+#Best Test performance: {'mse': 0.00037784899098915913, 'mrrt': 0.027345894375467396, 'btl': 0.9153886415879242}
