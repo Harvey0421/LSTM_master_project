@@ -333,7 +333,8 @@ class RankLSTM:
         tf.compat.v1.reset_default_graph()
 
         return best_valid_pred, best_valid_gt, best_valid_mask, \
-               best_test_pred, best_test_gt, best_test_mask
+               best_test_pred, best_test_gt, best_test_mask, \
+               best_valid_perf, best_test_perf
 
     def update_model(self, parameters):
         for name, value in parameters.items():

@@ -24,19 +24,23 @@ def save_results_to_csv(results, avg_results, filename):
                 writer.writerow(row_data)
 
             # Write the average for each hyperparameter set
-            avg_row_data = ['Average', '', avg_results[f'set_{idx}_mse'], avg_results[f'set_{idx}_mrrt'], avg_results[f'set_{idx}_btl']]
+            avg_row_data = ['Average', '', avg_results[f'set_{idx+1}_mse'], avg_results[f'set_{idx+1}_mrrt'], avg_results[f'set_{idx+1}_btl']]
             writer.writerow(avg_row_data)
             writer.writerow([])  # Add an empty row to separate results from the next hyperparameter set
 
 def calculate_average(results):
-    # Calculate the average of each evaluator for each hyperparameter set
-    num_runs = len(next(iter(results.values())))
-    num_sets = len(results)
     avg_results = {}
+    num_sets = len(results)
+
     for idx, result_set in enumerate(results.values()):
-        avg_results[f'set_{idx}_mse'] = sum(result['mse'] for result in result_set) / num_runs
-        avg_results[f'set_{idx}_mrrt'] = sum(result['mrrt'] for result in result_set) / num_runs
-        avg_results[f'set_{idx}_btl'] = sum(result['btl'] for result in result_set) / num_runs
+        num_runs = len(result_set)
+        avg_mse = sum(result['mse'] for result in result_set) / num_runs
+        avg_mrrt = sum(result['mrrt'] for result in result_set) / num_runs
+        avg_btl = sum(result['btl'] for result in result_set) / num_runs
+
+        avg_results[f'set_{idx + 1}_mse'] = avg_mse
+        avg_results[f'set_{idx + 1}_mrrt'] = avg_mrrt
+        avg_results[f'set_{idx + 1}_btl'] = avg_btl
 
     return avg_results
 
@@ -48,33 +52,35 @@ def main():
     parameter = {'seq': 4, 'unit': 64, 'lr': 0.001, 'alpha': 1}
     hyperparameter_sets = [
         #RankLSTM
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'parameters': parameter},
-        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'parameters': parameter},
         #ReRaLSTM
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation':rel[0], 'parameters': parameter},
-        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[1], 'parameters': parameter},
-        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation':rel[0], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[1], 'parameters': parameter},
+        #{'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter},
         #ReRaPrLSTM
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.9.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.925.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.95.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.975.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.99.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.9.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.925.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.95.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.975.json'},
-        {'data_path': '../data/2013-01-01', 'market_name': market[0], 'tickers_fname': tick[0], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[0] + '_correlation_graph_0.99.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.9.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.925.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.95.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.975.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[0], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.99.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.9.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.925.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.95.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.975.json'},
+        {'data_path': '../data/2013-01-01', 'market_name': market[1], 'tickers_fname': tick[1], 'relation': rel[1], 'parameters': parameter, 'new_relation_graph': '../data/price_graph/' + market[1] + '_correlation_graph_0.99.json'},
     ]
+    for i in range(0, len(hyperparameter_sets)):
+        print(hyperparameter_sets[i])
 
     results = {}
     total=len(hyperparameter_sets)*5
     current=1
     for idx, hyperparameters in enumerate(hyperparameter_sets):
         result_set = []
-        if idx < 2:
-            for run_num in range(1):
+        if idx < 0:
+            for run_num in range(5):
                 print(f'Running set {idx + 1} of {len(hyperparameter_sets)} ({current} of {total})')
                 current+=1
                 rank_LSTM = RankLSTM(data_path=hyperparameters['data_path'],
@@ -85,8 +91,8 @@ def main():
                 result = rank_LSTM.train()
                 result_set.append(result[-1])
             results[f'Set {idx + 1}'] = result_set
-        elif idx < 6 and idx >= 2:
-            for run_num in range(1):
+        elif idx < 0 and idx >= 0:
+            for run_num in range(5):
                 print(f'Running set {idx + 1} of {len(hyperparameter_sets)} ({current} of {total})')
                 current+=1
                 RR_LSTM = ReRaLSTM(
@@ -98,10 +104,10 @@ def main():
                     steps=1, epochs=50, batch_size=None, gpu=1, in_pro=False
                 )
                 result = RR_LSTM.train()
-                result_set.append(result)
+                result_set.append(result[-1])
             results[f'Set {idx + 1}'] = result_set
         else:
-            for run_num in range(1):
+            for run_num in range(5):
                 print(f'Running set {idx + 1} of {len(hyperparameter_sets)} ({current} of {total})')
                 current+=1
                 RRP_LSTM = ReRaPrLSTM(
@@ -115,13 +121,12 @@ def main():
                     new_relation_graph=hyperparameters['new_relation_graph']
                 )
                 result = RRP_LSTM.train()
-                result_set.append(result)
+                result_set.append(result[-1])
             results[f'Set {idx + 1}'] = result_set
-
+    print(results)
     avg_results = calculate_average(results)
     save_results_to_csv(results, avg_results, 'training_results.csv')
 
-    print("Average Results:", avg_results)
 
 if __name__ == '__main__':
     main()
