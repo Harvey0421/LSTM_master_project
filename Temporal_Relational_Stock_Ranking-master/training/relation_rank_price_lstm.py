@@ -125,17 +125,19 @@ class ReRaPrLSTM:
         return relation_encoding
 
     def combine_masks(self, relation_mask, new_relation_mask):
+        boolean_relation_mask = tf.cast(relation_mask != -1e9, dtype=tf.bool)
+        boolean_new_relation_mask = tf.cast(new_relation_mask != -1e9, dtype=tf.bool)
 
-        combined_mask = np.where(
-            (relation_mask != -1e9) & (relation_mask == new_relation_mask),
-            1,
-            np.where(
-                (relation_mask != -1e9) & (relation_mask != new_relation_mask),
-                0,
-                np.where(
-                    (relation_mask == -1e9) & (new_relation_mask == -1e9),
+        combined_mask = tf.where(
+            boolean_relation_mask & (relation_mask == new_relation_mask),
+            1.0,
+            tf.where(
+                boolean_relation_mask & (relation_mask != new_relation_mask),
+                0.0,
+                tf.where(
+                    boolean_new_relation_mask,
                     -1e9,
-                    relation_mask  # Default value when none of the conditions are met
+                    relation_mask
                 )
             )
         )
@@ -531,7 +533,7 @@ if __name__ == '__main__':
     )
 
     pred_all = RRP_LSTM.train()
-    print('Pred_All:',pred_all)
+    #print('Pred_All:',pred_all)
 
 #Best Valid performance: {'mse': 0.0004958068088824255, 'mrrt': 0.0199531754167635, 'btl': 2.3591825100884307}
 #Best Test performance: {'mse': 0.00037784899098915913, 'mrrt': 0.027345894375467396, 'btl': 0.9153886415879242}
